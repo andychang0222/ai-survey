@@ -1,0 +1,5 @@
+# 忽略本機協作進度板與作業系統暫存檔（避免內部開發筆記隨公開 GitHub Pages 發布）
+REVIEW.md
+.DS_Store
+Thumbs.db
+*.log

@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>企業生成式 AI 工具使用現況與需求調查｜資訊管理單位（MIS）</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- 頂部官方資訊單位識別列 -->
+  <header class="official-header">
+    <div class="container header-inner">
+      <div class="brand-group">
+        <div class="brand-emblem" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="M9 12l2 2 4-4"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="org-tag">INTERNAL IT GOVERNANCE ｜ 企業內部資訊規劃專案</div>
+          <h1 class="site-title">企業生成式 AI 工具使用現況與導入需求調查</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button type="button" id="open-admin-btn" class="btn-outline-light">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>資訊單位統計後台</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 公文編號與單位資訊橫條 -->
+  <div class="doc-meta-bar">
+    <div class="container doc-meta-inner">
+      <span><strong>主辦單位：</strong>資訊管理單位（MIS）</span>
+      <span class="meta-sep" aria-hidden="true">｜</span>
+      <span><strong>表單編號：</strong>MIS-AI-2026-01</span>
+      <span class="meta-sep" aria-hidden="true">｜</span>
+      <span><strong>調查對象：</strong>全體部門同仁</span>
+      <span class="meta-sep" aria-hidden="true">｜</span>
+      <span><strong>預計填寫時間：</strong>約 1 ～ 2 分鐘</span>
+    </div>
+  </div>
+
+  <main class="container main-content">
+    <!-- ==================== 視圖一：員工問卷填報視圖 ==================== -->
+    <section id="survey-view" aria-labelledby="survey-form-heading">
+      <!-- 防釣魚資安公告卡片 -->
+      <div class="security-banner" role="note" aria-label="資訊單位資安聲明">
+        <div class="security-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <div class="security-text">
+          <strong>【資訊單位反釣魚與資安聲明】請安心填寫</strong>
+          <p>
+            本表單由公司資訊管理單位（MIS）發布，目的為盤點各部門日常作業對生成式 AI 工具之實際需求，作為<strong>年度企業商用版授權採購與資安規劃</strong>之依據。
+            <strong>本頁面絕不會要求您輸入電腦開機密碼（AD 密碼）、公司信箱密碼、身分證字號或任何個人金融資訊。</strong>若對本調查有任何疑問，歡迎直接聯繫資訊管理單位確認。
+          </p>
+        </div>
+      </div>
+
+      <!-- 送出成功畫面（預設隱藏） -->
+      <div id="submit-success-card" class="card success-card" hidden role="status" aria-live="polite">
+        <div class="success-badge" aria-hidden="true">✓</div>
+        <h2>感謝您的填寫，調查資料已成功送出！</h2>
+        <p id="success-summary-text" class="success-desc"></p>
+        <div class="receipt-box" id="submission-receipt"></div>
+        <div class="success-actions">
+          <button type="button" id="fill-another-btn" class="btn-secondary">代其他同仁填寫／重新填報</button>
+        </div>
+      </div>
+
+      <!-- 正式問卷表單 -->
+      <form id="ai-survey-form" class="survey-form" action="#submit" method="POST" aria-labelledby="survey-form-heading" novalidate>
+        <h2 id="survey-form-heading" class="visually-hidden">員工 AI 工具需求調查表單</h2>
+
+        <!-- 區塊一：填報人基本資料 -->
+        <section class="card form-section" aria-labelledby="sec-1-title">
+          <div class="section-header">
+            <span class="section-step">第一部分</span>
+            <h3 id="sec-1-title">填報人基本資訊</h3>
+          </div>
+          <p class="section-subtitle">僅供資訊單位核對各部門授權配額需求，不作其他用途。標示 <span class="req-mark" aria-hidden="true">*</span> 為必填項目。</p>
+
+          <div class="grid-two-col">
+            <div class="field">
+              <label for="department">所屬部門 <span class="req-mark" aria-hidden="true">*</span></label>
+              <span id="dept-hint" class="hint">請選擇您目前任職的部門單位</span>
+              <select
+                id="department"
+                name="department"
+                required
+                aria-describedby="dept-hint"
+                data-error="dept-error"
+              >
+                <option value="" disabled selected>請選擇所屬部門…</option>
+                <optgroup label="經營決策單位">
+                  <option value="董事長室">董事長室</option>
+                  <option value="總經理室">總經理室</option>
+                </optgroup>
+                <optgroup label="行政・財會・業務單位">
+                  <option value="行政部">行政部</option>
+                  <option value="會計部">會計部</option>
+                  <option value="財務部">財務部</option>
+                  <option value="業務部">業務部</option>
+                </optgroup>
+                <optgroup label="一部單位（工程／製造／品保／資材）">
+                  <option value="工程一部">工程一部</option>
+                  <option value="製造一部">製造一部</option>
+                  <option value="品保一部">品保一部</option>
+                  <option value="資材一部">資材一部</option>
+                </optgroup>
+                <optgroup label="三部單位（工程／製造／品保／資材）">
+                  <option value="工程三部">工程三部</option>
+                  <option value="製造三部">製造三部</option>
+                  <option value="品保三部">品保三部</option>
+                  <option value="資材三部">資材三部</option>
+                </optgroup>
+                <optgroup label="其他單位">
+                  <option value="其他">其他（請自行輸入）</option>
+                </optgroup>
+              </select>
+              <div id="dept-error" class="error-msg">
+                <span role="img" aria-label="錯誤">⚠️</span> 請選擇您的所屬部門。
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="employee-name">員工姓名 <span class="req-mark" aria-hidden="true">*</span></label>
+              <span id="name-hint" class="hint">請填寫真實中文或英文姓名</span>
+              <input
+                type="text"
+                id="employee-name"
+                name="employeeName"
+                required
+                maxlength="40"
+                autocomplete="name"
+                enterkeyhint="next"
+                aria-describedby="name-hint"
+                data-error="name-error"
+              >
+              <div id="name-error" class="error-msg">
+                <span role="img" aria-label="錯誤">⚠️</span> 請填寫您的姓名。
+              </div>
+            </div>
+          </div>
+
+          <!-- 選「其他」部門時動態顯示 -->
+          <div id="custom-dept-wrapper" class="field conditional-subbox" hidden>
+            <label for="custom-department">請填寫您的部門名稱 <span class="req-mark" aria-hidden="true">*</span></label>
+            <input
+              type="text"
+              id="custom-department"
+              name="customDepartment"
+              maxlength="50"
+              data-error="custom-dept-error"
+            >
+            <div id="custom-dept-error" class="error-msg">
+              <span role="img" aria-label="錯誤">⚠️</span> 您選擇了「其他」，請輸入部門名稱。
+            </div>
+          </div>
+        </section>
+
+        <!-- 區塊二：目前使用現況調查 -->
+        <section class="card form-section" aria-labelledby="sec-2-title">
+          <div class="section-header">
+            <span class="section-step">第二部分</span>
+            <h3 id="sec-2-title">目前 AI 工具使用現況</h3>
+          </div>
+          <p class="section-subtitle">了解同仁目前是否已在工作中使用 AI 工具（包含免費版或自行訂閱），以便評估轉換為公司企業安全帳號之優先順序。</p>
+
+          <fieldset class="fieldset-group" id="currently-using-fieldset">
+            <legend class="field-legend">1. 您目前在日常工作上，是否已經有使用 AI 工具？ <span class="req-mark" aria-hidden="true">*</span></legend>
+            <div class="radio-cards-row">
+              <div class="choice-card">
+                <input type="radio" id="using-yes" name="currentlyUsing" value="yes" required data-error="using-error">
+                <label for="using-yes">
+                  <strong>是，目前工作上已在使用</strong>
+                  <span>請於下方勾選正在使用的工具與版本（免費／付費）</span>
+                </label>
+              </div>
+              <div class="choice-card">
+                <input type="radio" id="using-no" name="currentlyUsing" value="no" required>
+                <label for="using-no">
+                  <strong>否，目前工作上尚未使用</strong>
+                  <span>可直接跳至第三部分填寫未來需求</span>
+                </label>
+              </div>
+            </div>
+            <div id="using-error" class="error-msg">
+              <span role="img" aria-label="錯誤">⚠️</span> 請選擇您目前是否已在使用 AI 工具。
+            </div>
+          </fieldset>
+
+          <!-- 當選擇「是，已在使用」時展開：勾選各工具並指定免費版或付費版 -->
+          <div id="current-tools-detail" class="conditional-panel" hidden>
+            <fieldset class="fieldset-group">
+              <legend class="field-legend">1-1. 請勾選您「目前正在使用」的 AI 工具，並點選使用的是免費版或付費版 <span class="req-mark" aria-hidden="true">*</span></legend>
+              <span class="hint">可複選；凡勾選之工具請一併標註為「免費版」或「付費版」。</span>
+
+              <div class="tool-tier-list">
+                <!-- ChatGPT -->
+                <div class="tool-tier-row" data-tool-row="ChatGPT">
+                  <div class="tool-check-part">
+                    <input type="checkbox" id="cur-chatgpt" name="currentTools" value="ChatGPT">
+                    <label for="cur-chatgpt">
+                      <span class="tool-name">ChatGPT</span>
+                      <span class="tool-vendor">OpenAI</span>
+                    </label>
+                  </div>
+                  <div class="tier-selector" data-tier-for="ChatGPT" hidden>
+                    <span class="tier-prompt">使用版本：</span>
+                    <div class="tier-pills" role="radiogroup" aria-label="ChatGPT 使用版本">
+                      <input type="radio" id="tier-chatgpt-free" name="tier_ChatGPT" value="免費版">
+                      <label for="tier-chatgpt-free">免費版</label>
+                      <input type="radio" id="tier-chatgpt-paid-self" name="tier_ChatGPT" value="付費版（個人自費）">
+                      <label for="tier-chatgpt-paid-self">付費版（個人自費）</label>
+                      <input type="radio" id="tier-chatgpt-paid-corp" name="tier_ChatGPT" value="付費版（公司既有授權）">
+                      <label for="tier-chatgpt-paid-corp">付費版（公司既有）</label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Claude -->
+                <div class="tool-tier-row" data-tool-row="Claude">
+                  <div class="tool-check-part">
+                    <input type="checkbox" id="cur-claude" name="currentTools" value="Claude">
+                    <label for="cur-claude">
+                      <span class="tool-name">Claude</span>
+                      <span class="tool-vendor">Anthropic</span>
+                    </label>
+                  </div>
+                  <div class="tier-selector" data-tier-for="Claude" hidden>
+                    <span class="tier-prompt">使用版本：</span>
+                    <div class="tier-pills" role="radiogroup" aria-label="Claude 使用版本">
+                      <input type="radio" id="tier-claude-free" name="tier_Claude" value="免費版">
+                      <label for="tier-claude-free">免費版</label>
+                      <input type="radio" id="tier-claude-paid-self" name="tier_Claude" value="付費版（個人自費）">
+                      <label for="tier-claude-paid-self">付費版（個人自費）</label>
+                      <input type="radio" id="tier-claude-paid-corp" name="tier_Claude" value="付費版（公司既有授權）">
+                      <label for="tier-claude-paid-corp">付費版（公司既有）</label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Gemini -->
+                <div class="tool-tier-row" data-tool-row="Gemini">
+                  <div class="tool-check-part">
+                    <input type="checkbox" id="cur-gemini" name="currentTools" value="Gemini">
+                    <label for="cur-gemini">
+                      <span class="tool-name">Gemini</span>
+                      <span class="tool-vendor">Google</span>
+                    </label>
+                  </div>
+                  <div class="tier-selector" data-tier-for="Gemini" hidden>
+                    <span class="tier-prompt">使用版本：</span>
+                    <div class="tier-pills" role="radiogroup" aria-label="Gemini 使用版本">
+                      <input type="radio" id="tier-gemini-free" name="tier_Gemini" value="免費版">
+                      <label for="tier-gemini-free">免費版</label>
+                      <input type="radio" id="tier-gemini-paid-self" name="tier_Gemini" value="付費版（個人自費）">
+                      <label for="tier-gemini-paid-self">付費版（個人自費）</label>
+                      <input type="radio" id="tier-gemini-paid-corp" name="tier_Gemini" value="付費版（公司既有授權）">
+                      <label for="tier-gemini-paid-corp">付費版（公司既有）</label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Microsoft 365 Copilot -->
+                <div class="tool-tier-row" data-tool-row="Microsoft 365 Copilot">
+                  <div class="tool-check-part">
+                    <input type="checkbox" id="cur-copilot" name="currentTools" value="Microsoft 365 Copilot">
+                    <label for="cur-copilot">
+                      <span class="tool-name">Microsoft 365 Copilot</span>
+                      <span class="tool-vendor">Microsoft</span>
+                    </label>
+                  </div>
+                  <div class="tier-selector" data-tier-for="Microsoft 365 Copilot" hidden>
+                    <span class="tier-prompt">使用版本：</span>
+                    <div class="tier-pills" role="radiogroup" aria-label="Microsoft 365 Copilot 使用版本">
+                      <input type="radio" id="tier-copilot-free" name="tier_Copilot" value="免費版">
+                      <label for="tier-copilot-free">免費版（網頁／Edge）</label>
+                      <input type="radio" id="tier-copilot-paid-self" name="tier_Copilot" value="付費版（個人自費）">
+                      <label for="tier-copilot-paid-self">付費版（個人自費）</label>
+                      <input type="radio" id="tier-copilot-paid-corp" name="tier_Copilot" value="付費版（公司既有授權）">
+                      <label for="tier-copilot-paid-corp">付費版（公司既有）</label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 其他使用中工具 -->
+                <div class="tool-tier-row" data-tool-row="其他">
+                  <div class="tool-check-part">
+                    <input type="checkbox" id="cur-other" name="currentTools" value="其他">
+                    <label for="cur-other">
+                      <span class="tool-name">其他 AI 工具</span>
+                      <span class="tool-vendor">自行輸入</span>
+                    </label>
+                  </div>
+                  <div class="tier-selector" data-tier-for="其他" hidden>
+                    <div class="other-inline-input">
+                      <label for="cur-other-name" class="visually-hidden">請輸入目前使用的其他 AI 工具名稱</label>
+                      <input type="text" id="cur-other-name" name="currentOtherName" maxlength="60" placeholder="請輸入工具名稱（如 Perplexity、Cursor…）">
+                    </div>
+                    <div class="tier-pills" role="radiogroup" aria-label="其他工具使用版本">
+                      <input type="radio" id="tier-other-free" name="tier_Other" value="免費版">
+                      <label for="tier-other-free">免費版</label>
+                      <input type="radio" id="tier-other-paid-self" name="tier_Other" value="付費版（個人自費）">
+                      <label for="tier-other-paid-self">付費版（個人自費）</label>
+                      <input type="radio" id="tier-other-paid-corp" name="tier_Other" value="付費版（公司既有授權）">
+                      <label for="tier-other-paid-corp">付費版（公司既有）</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="current-tools-error" class="error-msg" hidden>
+                <span role="img" aria-label="錯誤">⚠️</span> <span id="current-tools-error-text">請至少勾選一項正在使用的工具，並選擇使用版本（免費版或付費版）。</span>
+              </div>
+            </fieldset>
+          </div>
+        </section>
+
+        <!-- 區塊三：公司採購需求、工作用途與使用頻率 -->
+        <section class="card form-section" aria-labelledby="sec-3-title">
+          <div class="section-header">
+            <span class="section-step">第三部分</span>
+            <h3 id="sec-3-title">企業版 AI 需求、工作用途與使用頻率</h3>
+          </div>
+          <p class="section-subtitle">若公司導入具備商業機密保護與較高使用額度之企業版 AI，請勾選您工作上需要的工具、應用方向與預計頻率。</p>
+
+          <!-- Q2：希望公司提供的 AI 工具 -->
+          <fieldset class="fieldset-group">
+            <legend class="field-legend">2. 您希望申請／工作上需要的 AI 工具有哪些？（可複選） <span class="req-mark" aria-hidden="true">*</span></legend>
+            <div class="checkbox-grid">
+              <div class="check-card">
+                <input type="checkbox" id="req-chatgpt" name="requestedTools" value="ChatGPT">
+                <label for="req-chatgpt">
+                  <strong>ChatGPT</strong>
+                  <span>綜合文書撰寫、跨語翻譯、報表資料分析與深度搜尋</span>
+                </label>
+              </div>
+              <div class="check-card">
+                <input type="checkbox" id="req-claude" name="requestedTools" value="Claude">
+                <label for="req-claude">
+                  <strong>Claude</strong>
+                  <span>長篇合約與規範精讀、高品質企劃報告、工程與程式開發</span>
+                </label>
+              </div>
+              <div class="check-card">
+                <input type="checkbox" id="req-gemini" name="requestedTools" value="Gemini">
+                <label for="req-gemini">
+                  <strong>Gemini</strong>
+                  <span>超長多份 PDF 文件比對、會議錄音錄影整理、資料檢索</span>
+                </label>
+              </div>
+              <div class="check-card">
+                <input type="checkbox" id="req-copilot" name="requestedTools" value="Microsoft 365 Copilot">
+                <label for="req-copilot">
+                  <strong>Microsoft 365 Copilot</strong>
+                  <span>整合於 M365 雲端版 Word、Excel、PowerPoint、Teams</span>
+                </label>
+              </div>
+              <div class="check-card">
+                <input type="checkbox" id="req-other" name="requestedTools" value="其他">
+                <label for="req-other">
+                  <strong>其他工具（請填寫）</strong>
+                  <span>例如專業繪圖、程式輔助或特定領域 AI 工具</span>
+                </label>
+              </div>
+              <div class="check-card muted-card">
+                <input type="checkbox" id="req-none" name="requestedTools" value="暫無需求">
+                <label for="req-none">
+                  <strong>目前工作暫無需求</strong>
+                  <span>現階段作業暫時不需要申請企業版 AI 工具</span>
+                </label>
+              </div>
+            </div>
+
+            <div id="req-other-wrapper" class="field conditional-subbox" hidden>
+              <label for="req-other-name">請輸入您希望申請的其他 AI 工具名稱 <span class="req-mark" aria-hidden="true">*</span></label>
+              <input type="text" id="req-other-name" name="requestedOtherName" maxlength="80" placeholder="例如：GitHub Copilot、Perplexity、Cursor…">
+            </div>
+
+            <div id="requested-tools-error" class="error-msg" hidden>
+              <span role="img" aria-label="錯誤">⚠️</span> <span id="requested-tools-error-text">請至少勾選一項需求選項。</span>
+            </div>
+          </fieldset>
+
+          <!-- Q3：主要工作用途 -->
+          <fieldset class="fieldset-group" id="use-cases-fieldset">
+            <legend class="field-legend">3. 主要工作用途為何？（可複選） <span class="req-mark" aria-hidden="true">*</span></legend>
+            <div class="checkbox-list-compact">
+              <div class="check-item">
+                <input type="checkbox" id="use-mail" name="useCases" value="信件撰寫與跨國語文翻譯">
+                <label for="use-mail">商務信件撰寫、跨國語文翻譯（英／日／東南亞語系等）</label>
+              </div>
+              <div class="check-item">
+                <input type="checkbox" id="use-doc" name="useCases" value="會議紀錄、公文與簡報整理">
+                <label for="use-doc">會議紀錄摘要、內部公文草擬、簡報大綱與企劃製作</label>
+              </div>
+              <div class="check-item">
+                <input type="checkbox" id="use-excel" name="useCases" value="Excel 公式與生產／資材／財會數據分析">
+                <label for="use-excel">Excel 報表公式撰寫、生產／資材／業務／財會數據整理分析</label>
+              </div>
+              <div class="check-item">
+                <input type="checkbox" id="use-qa" name="useCases" value="品保異常分析報告與 SOP 規範編修">
+                <label for="use-qa">品保異常分析（如 8D 報告）、SOP 標準作業書與檢驗規範編修</label>
+              </div>
+              <div class="check-item">
+                <input type="checkbox" id="use-eng" name="useCases" value="工程技術文件檢索、研發與程式腳本">
+                <label for="use-eng">工程技術資料檢索、製程研發輔助、程式開發或自動化腳本撰寫</label>
+              </div>
+              <div class="check-item">
+                <input type="checkbox" id="use-legal" name="useCases" value="合約條款審閱、法規比對與長文摘要">
+                <label for="use-legal">合約條款審閱、ISO／客戶規範／法規條文比對、長篇報告摘要</label>
+              </div>
+              <div class="check-item">
+                <input type="checkbox" id="use-other" name="useCases" value="其他用途">
+                <label for="use-other">其他用途（請於下方補充）</label>
+              </div>
+            </div>
+
+            <div id="use-other-wrapper" class="field conditional-subbox" hidden>
+              <label for="use-other-text">請簡述其他工作用途 <span class="req-mark" aria-hidden="true">*</span></label>
+              <input type="text" id="use-other-text" name="useOtherText" maxlength="100">
+            </div>
+
+            <div id="use-cases-error" class="error-msg" hidden>
+              <span role="img" aria-label="錯誤">⚠️</span> <span id="use-cases-error-text">請至少勾選一項主要工作用途。</span>
+            </div>
+          </fieldset>
+
+          <!-- Q4：使用頻率 -->
+          <fieldset class="fieldset-group">
+            <legend class="field-legend">4. 工作上的使用頻率（目前或預計導入後）？ <span class="req-mark" aria-hidden="true">*</span></legend>
+            <div class="radio-stack">
+              <div class="radio-row">
+                <input type="radio" id="freq-daily" name="frequency" value="每日重度使用（每天多次）" required data-error="freq-error">
+                <label for="freq-daily"><strong>每日重度使用</strong> — 每天使用數次以上，日常核心業務高度依賴</label>
+              </div>
+              <div class="radio-row">
+                <input type="radio" id="freq-often" name="frequency" value="經常使用（每週 3～4 天）" required>
+                <label for="freq-often"><strong>經常使用</strong> — 每週約使用 3 ～ 4 天</label>
+              </div>
+              <div class="radio-row">
+                <input type="radio" id="freq-sometimes" name="frequency" value="偶爾使用（每週 1～2 次）" required>
+                <label for="freq-sometimes"><strong>偶爾使用</strong> — 每週約使用 1 ～ 2 次</label>
+              </div>
+              <div class="radio-row">
+                <input type="radio" id="freq-adhoc" name="frequency" value="視專案需求不定期使用" required>
+                <label for="freq-adhoc"><strong>不定期使用</strong> — 視特定專案、客訴報告或月結／季結報表需求使用</label>
+              </div>
+              <div class="radio-row">
+                <input type="radio" id="freq-none" name="frequency" value="暫無使用需求" required>
+                <label for="freq-none"><strong>暫無使用需求</strong> — 現階段工作暫時無須使用</label>
+              </div>
+            </div>
+            <div id="freq-error" class="error-msg">
+              <span role="img" aria-label="錯誤">⚠️</span> 請選擇您的預計使用頻率。
+            </div>
+          </fieldset>
+
+          <!-- Q5：補充建議 -->
+          <div class="field">
+            <label for="notes">5. 補充說明或目前工作遇到的痛點（選填）</label>
+            <span id="notes-hint" class="hint">例如：免費版經常額度受限、希望能協助加速哪類跨部門報表，或其他建議事項。</span>
+            <textarea
+              id="notes"
+              name="notes"
+              rows="3"
+              maxlength="500"
+              aria-describedby="notes-hint"
+            ></textarea>
+          </div>
+        </section>
+
+        <!-- 送出區塊 -->
+        <div class="submit-bar">
+          <p class="submit-privacy-note">送出後資料將匯入資訊管理單位（MIS）統計清單，供年度軟體授權評估使用。</p>
+          <button type="submit" id="submit-survey-btn" class="btn-primary">
+            確認無誤，送出調查表
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ==================== 視圖二：MIS 管理員統計與清單後台 ==================== -->
+    <section id="admin-view" hidden aria-labelledby="admin-dashboard-heading">
+      <div class="admin-toolbar card">
+        <div class="admin-toolbar-left">
+          <span class="admin-badge">MIS 管理員專區</span>
+          <h2 id="admin-dashboard-heading">AI 工具需求調查 — 統計分析與填報清單</h2>
+          <p id="data-source-status" class="admin-subtext"></p>
+        </div>
+        <div class="admin-toolbar-actions">
+          <div class="demo-toggle-wrap">
+            <input type="checkbox" id="toggle-demo-data" checked>
+            <label for="toggle-demo-data">包含預覽範例資料（16 筆）</label>
+          </div>
+          <button type="button" id="export-csv-btn" class="btn-primary">
+            匯出 Excel 統計清單 (.csv)
+          </button>
+          <button type="button" id="back-to-survey-btn" class="btn-secondary">
+            返回問卷頁面
+          </button>
+          <button type="button" id="logout-admin-btn" class="btn-ghost">
+            登出後台
+          </button>
+        </div>
+      </div>
+
+      <!-- 雲端串接狀態提示（目前為前端預覽＋本機儲存模式） -->
+      <div id="backend-mode-notice" class="admin-notice-bar">
+        <strong>資料儲存模式說明：</strong>
+        目前啟用「本機儲存 ＋ 預覽範例資料」模式，方便您先檢視完整統計圖表與測試填單流程；程式碼已內建雲端串接介面（<code>CONFIG.cloudEndpointUrl</code>），隨時可對接 Google 試算表或內部 API 進行全公司跨電腦即時匯總。
+      </div>
+
+      <!-- KPI 指標卡 -->
+      <div class="kpi-grid">
+        <div class="card kpi-card">
+          <span class="kpi-label">總填報人數</span>
+          <strong class="kpi-value" id="kpi-total">0</strong>
+          <span class="kpi-sub" id="kpi-dept-coverage">涵蓋 0 / 14 個部門</span>
+        </div>
+        <div class="card kpi-card">
+          <span class="kpi-label">目前已在使用 AI</span>
+          <strong class="kpi-value text-navy" id="kpi-using">0</strong>
+          <span class="kpi-sub" id="kpi-using-pct">佔總填報 0%</span>
+        </div>
+        <div class="card kpi-card kpi-warn">
+          <span class="kpi-label">使用「免費版」人數</span>
+          <strong class="kpi-value" id="kpi-free-users">0</strong>
+          <span class="kpi-sub">潛在機密外流・建議優先納管</span>
+        </div>
+        <div class="card kpi-card kpi-accent">
+          <span class="kpi-label">使用「付費版」人數</span>
+          <strong class="kpi-value" id="kpi-paid-users">0</strong>
+          <span class="kpi-sub" id="kpi-paid-breakdown">個人自費 0 人 ／ 公司既有 0 人</span>
+        </div>
+        <div class="card kpi-card kpi-success">
+          <span class="kpi-label">高頻率核心需求人數</span>
+          <strong class="kpi-value" id="kpi-high-freq">0</strong>
+          <span class="kpi-sub">每日重度 ＋ 每週經常使用</span>
+        </div>
+      </div>
+
+      <!-- 統計圖表網格 -->
+      <div class="charts-grid">
+        <!-- 圖表 1：各 AI 工具申請需求 vs 現況（免費／付費） -->
+        <section class="card chart-card" aria-labelledby="chart-tools-title">
+          <h3 id="chart-tools-title">各 AI 工具需求票數與現況版本統計</h3>
+          <p class="chart-desc">比較同仁「希望公司採購需求」與「目前免費版／付費版使用人數」</p>
+          <div id="tools-stats-container" class="bars-container"></div>
+        </section>
+
+        <!-- 圖表 2：各部門填報與高頻需求分佈 -->
+        <section class="card chart-card" aria-labelledby="chart-dept-title">
+          <h3 id="chart-dept-title">各部門填報人數與需求統計</h3>
+          <p class="chart-desc">涵蓋全公司 14 個正式部門與其他單位之填報進度</p>
+          <div id="dept-stats-container" class="dept-stats-list"></div>
+        </section>
+
+        <!-- 圖表 3：使用頻率分佈 -->
+        <section class="card chart-card" aria-labelledby="chart-freq-title">
+          <h3 id="chart-freq-title">工作使用頻率分佈</h3>
+          <p class="chart-desc">協助評估首批企業版授權席次規模</p>
+          <div id="freq-stats-container" class="bars-container"></div>
+        </section>
+
+        <!-- 圖表 4：主要工作用途排行 -->
+        <section class="card chart-card" aria-labelledby="chart-use-title">
+          <h3 id="chart-use-title">熱門工作應用場景排行</h3>
+          <p class="chart-desc">各部門勾選最需要 AI 協助的工作項目</p>
+          <div id="usecase-stats-container" class="bars-container"></div>
+        </section>
+      </div>
+
+      <!-- 填報人員完整清單與篩選器 -->
+      <section class="card table-section" aria-labelledby="submissions-caption">
+        <div class="table-header-bar">
+          <div>
+            <h3 class="section-h3">填報人員完整明細清單</h3>
+            <p class="chart-desc" id="filtered-count-text">共顯示 0 筆紀錄</p>
+          </div>
+          <button type="button" id="clear-local-btn" class="btn-danger-outline">
+            清除本機測試填報紀錄
+          </button>
+        </div>
+
+        <!-- 搜尋與篩選列（使用語意化 <search> 元素） -->
+        <search aria-label="篩選填報人員清單">
+          <form id="filter-form" class="filter-bar" action="#filter" method="GET">
+            <div class="filter-field">
+              <label for="filter-dept">部門篩選</label>
+              <select id="filter-dept" name="dept">
+                <option value="ALL">全部部門</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label for="filter-status">目前使用狀態</label>
+              <select id="filter-status" name="status">
+                <option value="ALL">全部狀態</option>
+                <option value="USING_FREE">使用中（含免費版）</option>
+                <option value="USING_PAID_SELF">使用中（含個人自費）</option>
+                <option value="USING_PAID_CORP">使用中（含公司既有授權）</option>
+                <option value="NOT_USING">目前尚未使用</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label for="filter-tool">需求工具篩選</label>
+              <select id="filter-tool" name="tool">
+                <option value="ALL">全部需求工具</option>
+                <option value="ChatGPT">ChatGPT</option>
+                <option value="Claude">Claude</option>
+                <option value="Gemini">Gemini</option>
+                <option value="Microsoft 365 Copilot">Microsoft 365 Copilot</option>
+                <option value="其他">其他工具</option>
+                <option value="暫無需求">暫無需求</option>
+              </select>
+            </div>
+            <div class="filter-field filter-search-box">
+              <label for="filter-keyword">姓名或關鍵字搜尋</label>
+              <input
+                type="search"
+                id="filter-keyword"
+                name="q"
+                placeholder="輸入姓名、工具或備註關鍵字…"
+                autocorrect="off"
+                autocapitalize="none"
+                spellcheck="false"
+              >
+            </div>
+          </form>
+        </search>
+
+        <!-- 響應式無障礙資料表 -->
+        <div tabindex="0" role="region" aria-labelledby="submissions-caption" class="table-wrapper">
+          <table id="submissions-table">
+            <caption id="submissions-caption" class="visually-hidden">員工 AI 工具需求調查填報明細表</caption>
+            <thead>
+              <tr>
+                <th scope="col">員工姓名</th>
+                <th scope="col">所屬部門</th>
+                <th scope="col">目前使用現況（免費／付費）</th>
+                <th scope="col">希望申請工具</th>
+                <th scope="col">使用頻率</th>
+                <th scope="col">主要工作用途</th>
+                <th scope="col">補充說明／填報時間</th>
+                <th scope="col">來源／操作</th>
+              </tr>
+            </thead>
+            <tbody id="submissions-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- 頁尾官方聲明 -->
+  <footer class="official-footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>企業資訊管理單位（MIS）製發</strong> ｜ 內部資訊系統需求盤點專用表單
+      </div>
+      <div class="footer-note">
+        本問卷資料僅供內部軟體授權採購評估，嚴格遵守公司資訊安全管理規範。
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== 管理員驗證原生 Modal Dialog ==================== -->
+  <dialog id="admin-auth-dialog" closedby="any" aria-labelledby="admin-dialog-title">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h2 id="admin-dialog-title">資訊管理單位（MIS）後台驗證</h2>
+        <button type="button" id="close-dialog-x" class="dialog-close-btn" aria-label="關閉驗證視窗">✕</button>
+      </div>
+      <p class="dialog-desc">
+        為保護同仁填報之姓名與部門統計清單，請輸入管理員檢視通行碼以進入統計後台與匯出報表。
+      </p>
+      <form id="admin-login-form" method="dialog" novalidate>
+        <div class="field">
+          <label for="admin-passcode">管理員通行碼 <span class="req-mark" aria-hidden="true">*</span></label>
+          <div class="password-input-group">
+            <input
+              type="password"
+              id="admin-passcode"
+              name="passcode"
+              autocomplete="current-password"
+              required
+              autofocus
+              aria-describedby="admin-pass-hint"
+              data-error="admin-auth-error"
+            >
+            <button
+              type="button"
+              id="toggle-passcode-btn"
+              class="btn-toggle-pw"
+              aria-pressed="false"
+              aria-label="顯示通行碼"
+              aria-describedby="toggle-pw-warn"
+            >
+              顯示
+            </button>
+            <span id="toggle-pw-warn" class="visually-hidden">注意：這將在螢幕上顯示您輸入的通行碼。</span>
+          </div>
+          <span id="admin-pass-hint" class="hint">僅限資訊管理單位授權人員存取。</span>
+          <div id="admin-auth-error" class="error-msg" hidden>
+            <span role="img" aria-label="錯誤">⚠️</span> 通行碼不正確，請重新確認後再試。
+          </div>
+        </div>
+        <div class="dialog-actions">
+          <button type="button" id="cancel-dialog-btn" class="btn-secondary">取消</button>
+          <button type="submit" id="confirm-login-btn" class="btn-primary">驗證並開啟統計清單</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
