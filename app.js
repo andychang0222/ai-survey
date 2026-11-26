@@ -15,17 +15,17 @@
     adminPasscodeSha256: '33c57a2b84461562b22cd55ea1b2d1a7d4384fffc15d496788cb14920aff6f51',
     // 預留雲端串接網址（例如 Google Apps Script Web App URL）；空白時採本機儲存模式
     cloudEndpointUrl: '',
+    usdToTwdRate: 32.5,
     officialDepartments: [
-      '董事長室', '總經理室',
-      '行政部', '會計部', '財務部', '業務部',
-      '工程一部', '製造一部', '品保一部', '資材一部',
-      '工程三部', '製造三部', '品保三部', '資材三部'
+      '董事長室', '總經理室', '行政部', '業務部', '會計部', '財務部',
+      '工程一部', '工程三部', '製造一部', '製造三部',
+      '品保一部', '品保三部', '資材一部', '資材三部'
     ],
     coreTools: ['ChatGPT', 'Claude', 'Gemini', 'Microsoft 365 Copilot']
   };
 
   /* ==========================================================================
-     2. 內建 16 筆擬真預覽範例資料（涵蓋各實際部門，供 MIS 預覽統計報表效果）
+     2. 內建 16 筆擬真預覽範例資料（涵蓋 14 個實際部門及付費方案金額）
      ========================================================================== */
   const DEMO_RECORDS = [
     {
@@ -35,7 +35,16 @@
       department: '董事長室',
       employeeName: '林雅筑（範例）',
       currentlyUsing: true,
-      currentTools: [{ tool: 'ChatGPT', tier: '付費版（個人自費）' }],
+      currentTools: [
+        {
+          tool: 'ChatGPT',
+          tier: '付費版',
+          planName: 'ChatGPT Plus',
+          feeUnit: 'USD/月',
+          feeAmount: 20,
+          payer: '個人自費'
+        }
+      ],
       requestedTools: ['ChatGPT', 'Claude'],
       frequency: '每日重度使用（每天多次）',
       useCases: ['會議紀錄、公文與簡報整理', '合約條款審閱、法規比對與長文摘要'],
@@ -65,7 +74,14 @@
       employeeName: '張哲瑋（範例）',
       currentlyUsing: true,
       currentTools: [
-        { tool: 'Claude', tier: '付費版（個人自費）' },
+        {
+          tool: 'Claude',
+          tier: '付費版',
+          planName: 'Claude Pro',
+          feeUnit: 'USD/月',
+          feeAmount: 20,
+          payer: '個人自費'
+        },
         { tool: 'ChatGPT', tier: '免費版' }
       ],
       requestedTools: ['Claude', '其他：GitHub Copilot'],
@@ -94,8 +110,22 @@
       employeeName: '吳佩珊（範例）',
       currentlyUsing: true,
       currentTools: [
-        { tool: 'ChatGPT', tier: '付費版（個人自費）' },
-        { tool: 'Microsoft 365 Copilot', tier: '付費版（公司既有授權）' }
+        {
+          tool: 'ChatGPT',
+          tier: '付費版',
+          planName: 'ChatGPT Plus',
+          feeUnit: 'NT$/月',
+          feeAmount: 690,
+          payer: '個人自費'
+        },
+        {
+          tool: 'Microsoft 365 Copilot',
+          tier: '付費版',
+          planName: 'Microsoft 365 Copilot 商務／企業版',
+          feeUnit: 'USD/月',
+          feeAmount: 30,
+          payer: '公司既有授權／報支'
+        }
       ],
       requestedTools: ['ChatGPT', 'Microsoft 365 Copilot'],
       frequency: '每日重度使用（每天多次）',
@@ -200,7 +230,16 @@
       department: '財務部',
       employeeName: '王柏鈞（範例）',
       currentlyUsing: true,
-      currentTools: [{ tool: 'ChatGPT', tier: '付費版（個人自費）' }],
+      currentTools: [
+        {
+          tool: 'ChatGPT',
+          tier: '付費版',
+          planName: 'ChatGPT Plus',
+          feeUnit: 'USD/月',
+          feeAmount: 20,
+          payer: '個人自費'
+        }
+      ],
       requestedTools: ['ChatGPT', 'Claude'],
       frequency: '每日重度使用（每天多次）',
       useCases: ['合約條款審閱、法規比對與長文摘要', 'Excel 公式與生產／資材／財會數據分析'],
@@ -258,7 +297,6 @@
         .map((b) => b.toString(16).padStart(2, '0'))
         .join('');
     }
-    // 非安全上下文（如直接雙擊本機 file:// 預覽時）之標準 SHA-256 純 JS 實作
     const K = [
       0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
       0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
@@ -398,7 +436,6 @@
     setTimeout(() => [...(e.target.elements || [])].forEach((el) => syncAria(el)));
   }, true);
 
-  // 針對極舊不支援 :user-invalid 之瀏覽器降級支援
   if (!supportsUserInvalid) {
     const dirtyState = new WeakMap();
     const updateFallback = (input) => {
@@ -451,7 +488,7 @@
   });
 
   /* ==========================================================================
-     6. 本機儲存讀寫輔助函式
+     6. 資料讀寫與方案費用格式化／換算輔助函式
      ========================================================================== */
   function loadLocalRecords() {
     try {
@@ -474,30 +511,127 @@
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
+  function formatFeeDisplay(feeUnit, feeAmount) {
+    if (!feeUnit || feeAmount === undefined || feeAmount === '') return '';
+    const [currency, cycle] = feeUnit.split('/');
+    return `${currency} ${feeAmount}/${cycle || '月'}`;
+  }
+
+  function formatCurrentToolSummary(item) {
+    if (item.tier === '免費版') {
+      return `${item.tool}｜免費版`;
+    }
+    if (item.planName) {
+      const feeStr = formatFeeDisplay(item.feeUnit, item.feeAmount);
+      const payerStr = item.payer ? `・${item.payer}` : '';
+      return `${item.tool}｜付費版：${item.planName}（${feeStr}${payerStr}）`;
+    }
+    return `${item.tool}｜${item.tier}`;
+  }
+
+  function estimateItemMonthlyTwd(item) {
+    if (!item || item.tier === '免費版') return 0;
+    const amt = Number(item.feeAmount) || 0;
+    if (amt <= 0) return 0;
+    switch (item.feeUnit) {
+      case 'NT$/月':
+        return amt;
+      case 'USD/月':
+        return amt * CONFIG.usdToTwdRate;
+      case 'NT$/年':
+        return amt / 12;
+      case 'USD/年':
+        return (amt * CONFIG.usdToTwdRate) / 12;
+      default:
+        return 0;
+    }
+  }
+
+  function estimateRecordMonthlyTwd(rec) {
+    if (!rec.currentlyUsing || !Array.isArray(rec.currentTools)) return 0;
+    return rec.currentTools.reduce((sum, item) => sum + estimateItemMonthlyTwd(item), 0);
+  }
+
   /* ==========================================================================
      7. 問卷表單動態互動與驗證送出邏輯
      ========================================================================== */
   const surveyForm = document.getElementById('ai-survey-form');
   const deptSelect = document.getElementById('department');
-  const customDeptWrapper = document.getElementById('custom-dept-wrapper');
-  const customDeptInput = document.getElementById('custom-department');
-
-  // 7-1. 部門選「其他」時展開輸入框
-  deptSelect.addEventListener('change', () => {
-    const isOther = deptSelect.value === '其他';
-    customDeptWrapper.hidden = !isOther;
-    customDeptInput.required = isOther;
-    if (!isOther) {
-      customDeptInput.value = '';
-      customDeptInput.setAttribute('aria-invalid', 'false');
-    }
-  });
-
-  // 7-2. 目前是否使用中展開控制
   const currentToolsPanel = document.getElementById('current-tools-detail');
   const currentToolsError = document.getElementById('current-tools-error');
   const currentToolsErrorText = document.getElementById('current-tools-error-text');
 
+  // 各工具對應之免費／付費及方案金額欄位設定
+  const TOOL_META = {
+    'ChatGPT': {
+      radioName: 'tier_ChatGPT',
+      planSelectId: 'plan-chatgpt',
+      planCustomId: 'plan-custom-chatgpt',
+      feeUnitId: 'fee-unit-chatgpt',
+      feeAmtId: 'fee-amt-chatgpt',
+      payerId: 'payer-chatgpt'
+    },
+    'Claude': {
+      radioName: 'tier_Claude',
+      planSelectId: 'plan-claude',
+      planCustomId: 'plan-custom-claude',
+      feeUnitId: 'fee-unit-claude',
+      feeAmtId: 'fee-amt-claude',
+      payerId: 'payer-claude'
+    },
+    'Gemini': {
+      radioName: 'tier_Gemini',
+      planSelectId: 'plan-gemini',
+      planCustomId: 'plan-custom-gemini',
+      feeUnitId: 'fee-unit-gemini',
+      feeAmtId: 'fee-amt-gemini',
+      payerId: 'payer-gemini'
+    },
+    'Microsoft 365 Copilot': {
+      radioName: 'tier_Copilot',
+      planSelectId: 'plan-copilot',
+      planCustomId: 'plan-custom-copilot',
+      feeUnitId: 'fee-unit-copilot',
+      feeAmtId: 'fee-amt-copilot',
+      payerId: 'payer-copilot'
+    },
+    '其他': {
+      radioName: 'tier_Other',
+      planSelectId: null,
+      planCustomId: 'plan-custom-other',
+      feeUnitId: 'fee-unit-other',
+      feeAmtId: 'fee-amt-other',
+      payerId: 'payer-other'
+    }
+  };
+
+  function resetPaidBoxFields(toolKey) {
+    const meta = TOOL_META[toolKey];
+    if (!meta) return;
+    const paidBox = document.querySelector(`.paid-plan-subbox[data-paid-box="${toolKey}"]`);
+    if (paidBox) paidBox.hidden = true;
+
+    if (meta.planSelectId) {
+      const sel = document.getElementById(meta.planSelectId);
+      if (sel) sel.selectedIndex = 0;
+      const customInp = document.getElementById(meta.planCustomId);
+      if (customInp) {
+        customInp.hidden = true;
+        customInp.value = '';
+      }
+    } else if (meta.planCustomId) {
+      const customInp = document.getElementById(meta.planCustomId);
+      if (customInp) customInp.value = '';
+    }
+
+    const amtInp = document.getElementById(meta.feeAmtId);
+    if (amtInp) {
+      amtInp.value = '';
+      delete amtInp.dataset.userEdited;
+    }
+  }
+
+  // 7-1. 目前是否使用中展開控制
   document.querySelectorAll('input[name="currentlyUsing"]').forEach((radio) => {
     radio.addEventListener('change', () => {
       const isUsing = document.getElementById('using-yes').checked;
@@ -508,24 +642,17 @@
     });
   });
 
-  // 勾選目前正在使用的各別工具時，顯示該工具之免費版／付費版選擇器
-  const TOOL_RADIO_NAME_MAP = {
-    'ChatGPT': 'tier_ChatGPT',
-    'Claude': 'tier_Claude',
-    'Gemini': 'tier_Gemini',
-    'Microsoft 365 Copilot': 'tier_Copilot',
-    '其他': 'tier_Other'
-  };
-
+  // 7-2. 勾選目前使用工具 -> 顯示免費／付費；選付費 -> 展開方案與金額
   document.querySelectorAll('input[name="currentTools"]').forEach((chk) => {
     chk.addEventListener('change', () => {
       const toolKey = chk.value;
+      const meta = TOOL_META[toolKey];
       const selectorBox = document.querySelector(`.tier-selector[data-tier-for="${toolKey}"]`);
       if (selectorBox) {
         selectorBox.hidden = !chk.checked;
-        if (!chk.checked) {
-          const radioName = TOOL_RADIO_NAME_MAP[toolKey];
-          document.querySelectorAll(`input[name="${radioName}"]`).forEach((r) => { r.checked = false; });
+        if (!chk.checked && meta) {
+          document.querySelectorAll(`input[name="${meta.radioName}"]`).forEach((r) => { r.checked = false; });
+          resetPaidBoxFields(toolKey);
           if (toolKey === '其他') {
             document.getElementById('cur-other-name').value = '';
           }
@@ -535,9 +662,61 @@
     });
   });
 
-  document.querySelectorAll('.tier-pills input[type="radio"], #cur-other-name').forEach((el) => {
-    el.addEventListener('change', () => { currentToolsError.hidden = true; });
-    el.addEventListener('input', () => { currentToolsError.hidden = true; });
+  Object.entries(TOOL_META).forEach(([toolKey, meta]) => {
+    // 切換「免費版」與「付費版」
+    document.querySelectorAll(`input[name="${meta.radioName}"]`).forEach((r) => {
+      r.addEventListener('change', () => {
+        const isPaid = r.value === '付費版' && r.checked;
+        const paidBox = document.querySelector(`.paid-plan-subbox[data-paid-box="${toolKey}"]`);
+        if (paidBox) {
+          paidBox.hidden = !isPaid;
+          if (!isPaid) resetPaidBoxFields(toolKey);
+        }
+        currentToolsError.hidden = true;
+      });
+    });
+
+    // 記錄使用者是否手動改過金額（避免選單自動預填覆蓋使用者手填數字）
+    const amtInp = document.getElementById(meta.feeAmtId);
+    if (amtInp) {
+      amtInp.addEventListener('input', () => {
+        amtInp.dataset.userEdited = amtInp.value.trim() ? 'true' : '';
+        currentToolsError.hidden = true;
+      });
+    }
+
+    // 選擇預設方案時，自動展開自訂框或貼心帶入官方參考月費（使用者仍可自由修改）
+    if (meta.planSelectId) {
+      const sel = document.getElementById(meta.planSelectId);
+      const customInp = document.getElementById(meta.planCustomId);
+      const unitSel = document.getElementById(meta.feeUnitId);
+
+      sel.addEventListener('change', () => {
+        const isCustom = sel.value === 'CUSTOM';
+        customInp.hidden = !isCustom;
+        if (isCustom) {
+          customInp.focus();
+        } else {
+          customInp.value = '';
+          const opt = sel.options[sel.selectedIndex];
+          if (opt && !amtInp.dataset.userEdited) {
+            if (opt.dataset.cur) unitSel.value = opt.dataset.cur;
+            if (opt.dataset.amt) amtInp.value = opt.dataset.amt;
+          }
+        }
+        currentToolsError.hidden = true;
+      });
+
+      customInp.addEventListener('input', () => { currentToolsError.hidden = true; });
+    } else if (meta.planCustomId) {
+      document.getElementById(meta.planCustomId).addEventListener('input', () => {
+        currentToolsError.hidden = true;
+      });
+    }
+  });
+
+  document.getElementById('cur-other-name').addEventListener('input', () => {
+    currentToolsError.hidden = true;
   });
 
   // 7-3. 希望申請工具：「暫無需求」與其他工具互斥處理
@@ -557,7 +736,6 @@
         });
         reqOtherWrapper.hidden = true;
         reqOtherName.value = '';
-        // 若選暫無需求且尚未使用 AI，可貼心預設頻率為「暫無使用需求」
         if (document.getElementById('using-no').checked) {
           document.getElementById('freq-none').checked = true;
         }
@@ -569,7 +747,6 @@
       if (!reqOtherChk.checked) reqOtherName.value = '';
       reqToolsError.hidden = true;
 
-      // 當勾選「暫無需求」且目前未使用時，用途改為選填提示
       useCasesFieldset.style.opacity = (reqNoneChk.checked && !document.getElementById('using-yes').checked) ? '0.75' : '1';
     });
   });
@@ -595,17 +772,15 @@
 
     let firstInvalidControl = null;
 
-    // 先執行瀏覽器原生必填檢查
     const nativeValid = surveyForm.checkValidity();
     if (!nativeValid) {
       firstInvalidControl = surveyForm.querySelector(':invalid');
-      // 觸發 invalid 事件以顯示 :user-invalid / ARIA 狀態
       surveyForm.querySelectorAll(':invalid').forEach((el) => {
         el.dispatchEvent(new Event('invalid', { cancelable: true }));
       });
     }
 
-    // 檢查 1-1：若選擇「目前已在使用」，至少勾選一項工具且必須選免費版／付費版
+    // 檢查 1-1：若選擇「目前已在使用」，檢查工具、免費／付費、方案名稱與金額
     const isUsing = document.getElementById('using-yes').checked;
     const selectedCurrentTools = [];
     if (isUsing) {
@@ -615,37 +790,89 @@
         currentToolsError.hidden = false;
         if (!firstInvalidControl) firstInvalidControl = document.getElementById('cur-chatgpt');
       } else {
-        let missingTier = false;
-        let missingOtherName = false;
+        let errorMsg = '';
         for (const chk of checkedCurrent) {
           const toolKey = chk.value;
-          const radioName = TOOL_RADIO_NAME_MAP[toolKey];
-          const chosenRadio = document.querySelector(`input[name="${radioName}"]:checked`);
-          if (!chosenRadio) {
-            missingTier = true;
-            if (!firstInvalidControl) {
-              firstInvalidControl = document.querySelector(`input[name="${radioName}"]`);
-            }
-          }
+          const meta = TOOL_META[toolKey];
           let displayTool = toolKey;
+
           if (toolKey === '其他') {
             const customTool = document.getElementById('cur-other-name').value.trim();
             if (!customTool) {
-              missingOtherName = true;
+              errorMsg = '您勾選了「其他 AI 工具」，請輸入工具名稱。';
               if (!firstInvalidControl) firstInvalidControl = document.getElementById('cur-other-name');
-            } else {
-              displayTool = `其他：${customTool}`;
+              break;
             }
+            displayTool = `其他：${customTool}`;
           }
-          if (chosenRadio) {
-            selectedCurrentTools.push({ tool: displayTool, tier: chosenRadio.value });
+
+          const chosenRadio = document.querySelector(`input[name="${meta.radioName}"]:checked`);
+          if (!chosenRadio) {
+            errorMsg = `請選擇「${displayTool}」目前使用的是免費版或付費版。`;
+            if (!firstInvalidControl) {
+              firstInvalidControl = document.querySelector(`input[name="${meta.radioName}"]`);
+            }
+            break;
+          }
+
+          if (chosenRadio.value === '免費版') {
+            selectedCurrentTools.push({ tool: displayTool, tier: '免費版' });
+          } else {
+            // 驗證付費版之方案名稱與費用金額
+            let planName = '';
+            if (meta.planSelectId) {
+              const sel = document.getElementById(meta.planSelectId);
+              const customInp = document.getElementById(meta.planCustomId);
+              if (!sel.value) {
+                errorMsg = `請選擇「${displayTool}」的付費訂閱方案。`;
+                if (!firstInvalidControl) firstInvalidControl = sel;
+                break;
+              }
+              if (sel.value === 'CUSTOM') {
+                if (!customInp.value.trim()) {
+                  errorMsg = `請輸入「${displayTool}」的自訂方案名稱。`;
+                  if (!firstInvalidControl) firstInvalidControl = customInp;
+                  break;
+                }
+                planName = customInp.value.trim();
+              } else {
+                planName = sel.value;
+              }
+            } else {
+              const customInp = document.getElementById(meta.planCustomId);
+              if (!customInp.value.trim()) {
+                errorMsg = `請輸入「${displayTool}」的付費方案名稱。`;
+                if (!firstInvalidControl) firstInvalidControl = customInp;
+                break;
+              }
+              planName = customInp.value.trim();
+            }
+
+            const amtInp = document.getElementById(meta.feeAmtId);
+            const rawAmt = amtInp.value.replace(/,/g, '').trim();
+            const parsedAmt = Number(rawAmt);
+            if (!rawAmt || Number.isNaN(parsedAmt) || parsedAmt < 0) {
+              errorMsg = `請填寫「${displayTool}（${planName}）」的費用金額（請輸入數字，例如 20 或 690）。`;
+              if (!firstInvalidControl) firstInvalidControl = amtInp;
+              break;
+            }
+
+            const feeUnit = document.getElementById(meta.feeUnitId).value;
+            const payer = document.getElementById(meta.payerId).value;
+
+            selectedCurrentTools.push({
+              tool: displayTool,
+              tier: '付費版',
+              planName,
+              feeUnit,
+              feeAmount: parsedAmt,
+              payer
+            });
           }
         }
-        if (missingOtherName) {
-          currentToolsErrorText.textContent = '您勾選了「其他 AI 工具」，請輸入工具名稱並選擇使用版本。';
-          currentToolsError.hidden = false;
-        } else if (missingTier) {
-          currentToolsErrorText.textContent = '請為每一項勾選的使用中工具點選「免費版」或「付費版」。';
+
+        if (errorMsg) {
+          currentToolsErrorText.textContent = errorMsg;
           currentToolsError.hidden = false;
         } else {
           currentToolsError.hidden = true;
@@ -675,7 +902,7 @@
       }
     }
 
-    // 檢查 Q3：主要工作用途（若非「尚未使用＋暫無需求」則必選至少一項）
+    // 檢查 Q3：主要工作用途
     const checkedUses = [...document.querySelectorAll('input[name="useCases"]:checked')];
     const isNoNeedAtAll = reqNoneChk.checked && !isUsing;
     const useCasesList = [];
@@ -703,20 +930,14 @@
       }
     }
 
-    // 若有任何欄位未通過驗證，將焦點導向第一個錯誤控制項
     if (firstInvalidControl) {
       firstInvalidControl.focus();
       return;
     }
 
-    // 防重複點擊送出
     const submitBtn = document.getElementById('submit-survey-btn');
     submitBtn.disabled = true;
     submitBtn.textContent = '資料送出處理中…';
-
-    const finalDept = deptSelect.value === '其他'
-      ? `其他（${customDeptInput.value.trim()}）`
-      : deptSelect.value;
 
     const chosenFreq = document.querySelector('input[name="frequency"]:checked')?.value || '';
     const recordId = `MIS-${Date.now().toString().slice(-6)}`;
@@ -725,7 +946,7 @@
       id: recordId,
       submittedAt: formatNowTimestamp(),
       isDemo: false,
-      department: finalDept,
+      department: deptSelect.value,
       employeeName: document.getElementById('employee-name').value.trim(),
       currentlyUsing: isUsing,
       currentTools: selectedCurrentTools,
@@ -735,12 +956,10 @@
       notes: document.getElementById('notes').value.trim()
     };
 
-    // 寫入本機儲存
     const existing = loadLocalRecords();
     existing.unshift(newRecord);
     saveLocalRecords(existing);
 
-    // 若日後設定了雲端 API（如 Google Apps Script），自動非同步傳送
     if (CONFIG.cloudEndpointUrl) {
       try {
         await fetch(CONFIG.cloudEndpointUrl, {
@@ -753,7 +972,6 @@
       }
     }
 
-    // 呈現送出成功收據卡（全面使用 DOM API 與 textContent 防止 XSS）
     renderSuccessReceipt(newRecord);
     surveyForm.hidden = true;
     const successCard = document.getElementById('submit-success-card');
@@ -786,7 +1004,7 @@
     addRow(
       '目前使用現況',
       rec.currentlyUsing
-        ? rec.currentTools.map((t) => `${t.tool}（${t.tier}）`).join('、')
+        ? rec.currentTools.map((t) => formatCurrentToolSummary(t)).join('；')
         : '目前尚未使用'
     );
     addRow('希望申請工具', rec.requestedTools.join('、'));
@@ -798,12 +1016,11 @@
   // 重新填報按鈕
   document.getElementById('fill-another-btn').addEventListener('click', () => {
     surveyForm.reset();
-    customDeptWrapper.hidden = true;
-    customDeptInput.required = false;
     currentToolsPanel.hidden = true;
     reqOtherWrapper.hidden = true;
     useOtherWrapper.hidden = true;
     document.querySelectorAll('.tier-selector').forEach((el) => { el.hidden = true; });
+    Object.keys(TOOL_META).forEach((k) => resetPaidBoxFields(k));
     document.getElementById('submit-success-card').hidden = true;
     surveyForm.hidden = false;
     deptSelect.focus();
@@ -830,7 +1047,6 @@
   document.getElementById('close-dialog-x').addEventListener('click', () => authDialog.close());
   document.getElementById('cancel-dialog-btn').addEventListener('click', () => authDialog.close());
 
-  // 顯示／隱藏通行碼無障礙切換按鈕
   togglePwBtn.addEventListener('click', () => {
     const showing = passcodeField.type === 'text';
     passcodeField.type = showing ? 'password' : 'text';
@@ -907,12 +1123,16 @@
       opt.textContent = d;
       filterDept.append(opt);
     });
-    const otherOpt = document.createElement('option');
-    otherOpt.value = '其他';
-    otherOpt.textContent = '其他自填部門';
-    filterDept.append(otherOpt);
 
-    filterDept.value = currentVal;
+    filterDept.value = [...filterDept.options].some((o) => o.value === currentVal) ? currentVal : 'ALL';
+  }
+
+  function isPaidSelfItem(t) {
+    return (t.tier === '付費版' && (t.payer || '').includes('個人自費')) || t.tier.includes('個人自費');
+  }
+
+  function isPaidCorpItem(t) {
+    return (t.tier === '付費版' && (t.payer || '').includes('公司')) || t.tier.includes('公司既有');
   }
 
   function hasFreeTier(rec) {
@@ -920,11 +1140,11 @@
   }
 
   function hasPaidSelfTier(rec) {
-    return rec.currentlyUsing && rec.currentTools.some((t) => t.tier.includes('個人自費'));
+    return rec.currentlyUsing && rec.currentTools.some(isPaidSelfItem);
   }
 
   function hasPaidCorpTier(rec) {
-    return rec.currentlyUsing && rec.currentTools.some((t) => t.tier.includes('公司既有'));
+    return rec.currentlyUsing && rec.currentTools.some(isPaidCorpItem);
   }
 
   function filterRecords(records) {
@@ -934,12 +1154,8 @@
     const kw = filterKeyword.value.trim().toLowerCase();
 
     return records.filter((r) => {
-      if (deptVal !== 'ALL') {
-        if (deptVal === '其他') {
-          if (!r.department.startsWith('其他')) return false;
-        } else if (r.department !== deptVal) {
-          return false;
-        }
+      if (deptVal !== 'ALL' && r.department !== deptVal) {
+        return false;
       }
 
       if (statusVal === 'USING_FREE' && !hasFreeTier(r)) return false;
@@ -960,7 +1176,7 @@
           r.employeeName,
           r.department,
           ...r.requestedTools,
-          ...r.currentTools.map((t) => `${t.tool} ${t.tier}`),
+          ...r.currentTools.map((t) => formatCurrentToolSummary(t)),
           ...r.useCases,
           r.notes || ''
         ].join(' ').toLowerCase();
@@ -979,7 +1195,6 @@
     document.getElementById('data-source-status').textContent =
       `目前統計總筆數：${total} 筆（本機實測填報 ${localCount} 筆 ＋ 預覽範例 ${toggleDemoChk.checked ? DEMO_RECORDS.length : 0} 筆）`;
 
-    // 計算五大 KPI
     const coveredOfficialDepts = new Set(
       records.map((r) => r.department).filter((d) => CONFIG.officialDepartments.includes(d))
     );
@@ -988,20 +1203,23 @@
     const paidSelfCount = records.filter(hasPaidSelfTier).length;
     const paidCorpCount = records.filter(hasPaidCorpTier).length;
     const anyPaidCount = records.filter((r) => hasPaidSelfTier(r) || hasPaidCorpTier(r)).length;
+    const totalMonthlyTwd = Math.round(
+      records.reduce((acc, r) => acc + estimateRecordMonthlyTwd(r), 0)
+    );
     const highFreqCount = records.filter(
       (r) => r.frequency.startsWith('每日重度') || r.frequency.startsWith('經常使用')
     ).length;
 
     document.getElementById('kpi-total').textContent = String(total);
     document.getElementById('kpi-dept-coverage').textContent =
-      `涵蓋 ${coveredOfficialDepts.size} / ${CONFIG.officialDepartments.length} 個正式部門`;
+      `涵蓋 ${coveredOfficialDepts.size} / ${CONFIG.officialDepartments.length} 個部門`;
     document.getElementById('kpi-using').textContent = String(usingCount);
     document.getElementById('kpi-using-pct').textContent =
       `佔總填報 ${total ? Math.round((usingCount / total) * 100) : 0}%`;
     document.getElementById('kpi-free-users').textContent = String(freeUsersCount);
     document.getElementById('kpi-paid-users').textContent = String(anyPaidCount);
     document.getElementById('kpi-paid-breakdown').textContent =
-      `個人自費 ${paidSelfCount} 人 ／ 公司既有 ${paidCorpCount} 人`;
+      `自費 ${paidSelfCount} ／ 公司 ${paidCorpCount}（月費約 NT$${totalMonthlyTwd.toLocaleString()}）`;
     document.getElementById('kpi-high-freq').textContent = String(highFreqCount);
 
     renderToolStats(records, total);
@@ -1070,10 +1288,10 @@
           r.currentTools.some((t) => matchTool(t) && t.tier === '免費版')
         ).length;
         const curPaidSelf = records.filter((r) =>
-          r.currentTools.some((t) => matchTool(t) && t.tier.includes('個人自費'))
+          r.currentTools.some((t) => matchTool(t) && isPaidSelfItem(t))
         ).length;
         const curPaidCorp = records.filter((r) =>
-          r.currentTools.some((t) => matchTool(t) && t.tier.includes('公司既有'))
+          r.currentTools.some((t) => matchTool(t) && isPaidCorpItem(t))
         ).length;
 
         if (curFree > 0) subTags.push({ text: `現況免費版：${curFree} 人`, cls: 'tag-free' });
@@ -1108,19 +1326,6 @@
       chip.append(nameSpan, numSpan);
       container.append(chip);
     });
-
-    const otherCount = records.filter((r) => r.department.startsWith('其他')).length;
-    if (otherCount > 0) {
-      const chip = document.createElement('div');
-      chip.className = 'dept-chip has-data';
-      const nameSpan = document.createElement('span');
-      nameSpan.textContent = '其他自填部門';
-      const numSpan = document.createElement('span');
-      numSpan.className = 'dept-chip-count';
-      numSpan.textContent = `${otherCount} 人`;
-      chip.append(nameSpan, numSpan);
-      container.append(chip);
-    }
   }
 
   function renderFreqStats(records, total) {
@@ -1184,16 +1389,13 @@
     filteredRecords.forEach((rec) => {
       const tr = document.createElement('tr');
 
-      // 1. 員工姓名 (Sticky Row Header <th scope="row">)
       const thName = document.createElement('th');
       thName.scope = 'row';
       thName.textContent = rec.employeeName;
 
-      // 2. 所屬部門
       const tdDept = document.createElement('td');
       tdDept.textContent = rec.department;
 
-      // 3. 目前使用現況（清楚標示免費版／付費版標籤）
       const tdCur = document.createElement('td');
       if (!rec.currentlyUsing || rec.currentTools.length === 0) {
         const tag = document.createElement('span');
@@ -1206,28 +1408,24 @@
         rec.currentTools.forEach((item) => {
           const badge = document.createElement('span');
           let cls = 'tag-free';
-          if (item.tier.includes('個人自費')) cls = 'tag-paid';
-          else if (item.tier.includes('公司既有')) cls = 'tag-corp';
+          if (isPaidSelfItem(item)) cls = 'tag-paid';
+          else if (isPaidCorpItem(item)) cls = 'tag-corp';
           badge.className = `mini-tag ${cls}`;
-          badge.textContent = `${item.tool}｜${item.tier}`;
+          badge.textContent = formatCurrentToolSummary(item);
           wrap.append(badge);
         });
         tdCur.append(wrap);
       }
 
-      // 4. 希望申請工具
       const tdReq = document.createElement('td');
       tdReq.textContent = rec.requestedTools.join('、');
 
-      // 5. 使用頻率
       const tdFreq = document.createElement('td');
       tdFreq.textContent = rec.frequency;
 
-      // 6. 主要工作用途
       const tdUse = document.createElement('td');
       tdUse.textContent = rec.useCases.join('；');
 
-      // 7. 補充說明／時間
       const tdNote = document.createElement('td');
       tdNote.className = 'cell-note-time';
       const noteSpan = document.createElement('span');
@@ -1237,7 +1435,6 @@
       timeSpan.textContent = `${rec.id} ｜ ${rec.submittedAt}`;
       tdNote.append(noteSpan, timeSpan);
 
-      // 8. 來源／操作
       const tdAction = document.createElement('td');
       if (rec.isDemo) {
         const demoTag = document.createElement('span');
@@ -1263,7 +1460,6 @@
     });
   }
 
-  // 篩選控制項事件綁定（不自動送出跳頁，即時過濾清單）
   document.getElementById('filter-form').addEventListener('submit', (e) => e.preventDefault());
   [toggleDemoChk, filterDept, filterStatus, filterTool].forEach((el) => {
     el.addEventListener('change', renderAdminDashboard);
@@ -1272,7 +1468,6 @@
     renderTableRows(filterRecords(getActiveRecords()));
   });
 
-  // 清除本機測試填報紀錄
   document.getElementById('clear-local-btn').addEventListener('click', () => {
     const local = loadLocalRecords();
     if (local.length === 0) return;
@@ -1282,7 +1477,7 @@
     }
   });
 
-  // 匯出 Excel 相容 UTF-8 BOM CSV 檔案
+  // 匯出 Excel 相容 UTF-8 BOM CSV 檔案（含付費方案明細與折合台幣月費）
   document.getElementById('export-csv-btn').addEventListener('click', () => {
     const rowsToExport = filterRecords(getActiveRecords());
     const headers = [
@@ -1292,7 +1487,9 @@
       '所屬部門',
       '員工姓名',
       '目前是否使用AI',
-      '目前使用工具與版本明細',
+      '目前使用工具與方案費用明細',
+      '付費方案與金額清單',
+      '現況折合台幣月費估算(NT$)',
       '含免費版使用',
       '含個人自費版',
       '含公司既有授權',
@@ -1313,8 +1510,21 @@
     const csvLines = [headers.map(escapeCsv).join(',')];
     rowsToExport.forEach((r) => {
       const curDetail = r.currentlyUsing
-        ? r.currentTools.map((t) => `${t.tool}(${t.tier})`).join(' / ')
+        ? r.currentTools.map((t) => formatCurrentToolSummary(t)).join(' / ')
         : '未使用';
+
+      const paidPlansOnly = r.currentlyUsing
+        ? r.currentTools
+            .filter((t) => t.tier !== '免費版')
+            .map((t) =>
+              t.planName
+                ? `${t.tool}: ${t.planName} (${formatFeeDisplay(t.feeUnit, t.feeAmount)}, ${t.payer})`
+                : `${t.tool}: ${t.tier}`
+            )
+            .join(' / ')
+        : '';
+
+      const estMonthlyTwd = Math.round(estimateRecordMonthlyTwd(r));
 
       const row = [
         r.id,
@@ -1324,6 +1534,8 @@
         r.employeeName,
         r.currentlyUsing ? '是' : '否',
         curDetail,
+        paidPlansOnly || '無',
+        estMonthlyTwd,
         hasFreeTier(r) ? '是' : '否',
         hasPaidSelfTier(r) ? '是' : '否',
         hasPaidCorpTier(r) ? '是' : '否',
@@ -1335,7 +1547,6 @@
       csvLines.push(row.map(escapeCsv).join(','));
     });
 
-    // 加入 UTF-8 BOM (\uFEFF) 確保台灣繁體中文 Windows Excel 直接開啟不亂碼
     const blob = new Blob(['\uFEFF' + csvLines.join('\r\n')], {
       type: 'text/csv;charset=utf-8;'
     });

@@ -105,31 +105,20 @@
                 data-error="dept-error"
               >
                 <option value="" disabled selected>請選擇所屬部門…</option>
-                <optgroup label="經營決策單位">
-                  <option value="董事長室">董事長室</option>
-                  <option value="總經理室">總經理室</option>
-                </optgroup>
-                <optgroup label="行政・財會・業務單位">
-                  <option value="行政部">行政部</option>
-                  <option value="會計部">會計部</option>
-                  <option value="財務部">財務部</option>
-                  <option value="業務部">業務部</option>
-                </optgroup>
-                <optgroup label="一部單位（工程／製造／品保／資材）">
-                  <option value="工程一部">工程一部</option>
-                  <option value="製造一部">製造一部</option>
-                  <option value="品保一部">品保一部</option>
-                  <option value="資材一部">資材一部</option>
-                </optgroup>
-                <optgroup label="三部單位（工程／製造／品保／資材）">
-                  <option value="工程三部">工程三部</option>
-                  <option value="製造三部">製造三部</option>
-                  <option value="品保三部">品保三部</option>
-                  <option value="資材三部">資材三部</option>
-                </optgroup>
-                <optgroup label="其他單位">
-                  <option value="其他">其他（請自行輸入）</option>
-                </optgroup>
+                <option value="董事長室">董事長室</option>
+                <option value="總經理室">總經理室</option>
+                <option value="行政部">行政部</option>
+                <option value="業務部">業務部</option>
+                <option value="會計部">會計部</option>
+                <option value="財務部">財務部</option>
+                <option value="工程一部">工程一部</option>
+                <option value="工程三部">工程三部</option>
+                <option value="製造一部">製造一部</option>
+                <option value="製造三部">製造三部</option>
+                <option value="品保一部">品保一部</option>
+                <option value="品保三部">品保三部</option>
+                <option value="資材一部">資材一部</option>
+                <option value="資材三部">資材三部</option>
               </select>
               <div id="dept-error" class="error-msg">
                 <span role="img" aria-label="錯誤">⚠️</span> 請選擇您的所屬部門。
@@ -153,21 +142,6 @@
               <div id="name-error" class="error-msg">
                 <span role="img" aria-label="錯誤">⚠️</span> 請填寫您的姓名。
               </div>
-            </div>
-          </div>
-
-          <!-- 選「其他」部門時動態顯示 -->
-          <div id="custom-dept-wrapper" class="field conditional-subbox" hidden>
-            <label for="custom-department">請填寫您的部門名稱 <span class="req-mark" aria-hidden="true">*</span></label>
-            <input
-              type="text"
-              id="custom-department"
-              name="customDepartment"
-              maxlength="50"
-              data-error="custom-dept-error"
-            >
-            <div id="custom-dept-error" class="error-msg">
-              <span role="img" aria-label="錯誤">⚠️</span> 您選擇了「其他」，請輸入部門名稱。
             </div>
           </div>
         </section>
@@ -203,129 +177,290 @@
             </div>
           </fieldset>
 
-          <!-- 當選擇「是，已在使用」時展開：勾選各工具並指定免費版或付費版 -->
+          <!-- 當選擇「是，已在使用」時展開：勾選各工具並指定免費版或付費版（方案名稱與費用） -->
           <div id="current-tools-detail" class="conditional-panel" hidden>
             <fieldset class="fieldset-group">
-              <legend class="field-legend">1-1. 請勾選您「目前正在使用」的 AI 工具，並點選使用的是免費版或付費版 <span class="req-mark" aria-hidden="true">*</span></legend>
-              <span class="hint">可複選；凡勾選之工具請一併標註為「免費版」或「付費版」。</span>
+              <legend class="field-legend">1-1. 請勾選您「目前正在使用」的 AI 工具，並選擇免費版或付費版（付費版請填寫方案與費用） <span class="req-mark" aria-hidden="true">*</span></legend>
+              <span class="hint">可複選；凡勾選「付費版」之工具，請一併選填目前訂閱之方案名稱與實際費用金額。</span>
 
               <div class="tool-tier-list">
                 <!-- ChatGPT -->
-                <div class="tool-tier-row" data-tool-row="ChatGPT">
-                  <div class="tool-check-part">
-                    <input type="checkbox" id="cur-chatgpt" name="currentTools" value="ChatGPT">
-                    <label for="cur-chatgpt">
-                      <span class="tool-name">ChatGPT</span>
-                      <span class="tool-vendor">OpenAI</span>
-                    </label>
+                <div class="tool-tier-card" data-tool-card="ChatGPT">
+                  <div class="tool-tier-row">
+                    <div class="tool-check-part">
+                      <input type="checkbox" id="cur-chatgpt" name="currentTools" value="ChatGPT">
+                      <label for="cur-chatgpt">
+                        <span class="tool-name">ChatGPT</span>
+                        <span class="tool-vendor">OpenAI</span>
+                      </label>
+                    </div>
+                    <div class="tier-selector" data-tier-for="ChatGPT" hidden>
+                      <span class="tier-prompt">使用版本：</span>
+                      <div class="tier-pills" role="radiogroup" aria-label="ChatGPT 使用版本">
+                        <input type="radio" id="tier-chatgpt-free" name="tier_ChatGPT" value="免費版">
+                        <label for="tier-chatgpt-free">免費版</label>
+                        <input type="radio" id="tier-chatgpt-paid" name="tier_ChatGPT" value="付費版">
+                        <label for="tier-chatgpt-paid">付費版</label>
+                      </div>
+                    </div>
                   </div>
-                  <div class="tier-selector" data-tier-for="ChatGPT" hidden>
-                    <span class="tier-prompt">使用版本：</span>
-                    <div class="tier-pills" role="radiogroup" aria-label="ChatGPT 使用版本">
-                      <input type="radio" id="tier-chatgpt-free" name="tier_ChatGPT" value="免費版">
-                      <label for="tier-chatgpt-free">免費版</label>
-                      <input type="radio" id="tier-chatgpt-paid-self" name="tier_ChatGPT" value="付費版（個人自費）">
-                      <label for="tier-chatgpt-paid-self">付費版（個人自費）</label>
-                      <input type="radio" id="tier-chatgpt-paid-corp" name="tier_ChatGPT" value="付費版（公司既有授權）">
-                      <label for="tier-chatgpt-paid-corp">付費版（公司既有）</label>
+                  <div class="paid-plan-subbox" data-paid-box="ChatGPT" hidden>
+                    <div class="paid-plan-grid">
+                      <div class="sub-field">
+                        <label for="plan-chatgpt">訂閱方案名稱 <span class="req-mark" aria-hidden="true">*</span></label>
+                        <select id="plan-chatgpt" data-plan-select="ChatGPT">
+                          <option value="" disabled selected>請選擇方案…</option>
+                          <option value="ChatGPT Plus" data-cur="USD/月" data-amt="20">ChatGPT Plus（個人版）</option>
+                          <option value="ChatGPT Pro" data-cur="USD/月" data-amt="200">ChatGPT Pro（高階個人版）</option>
+                          <option value="ChatGPT Business / Team" data-cur="USD/月" data-amt="25">ChatGPT Business / Team（商務團隊版）</option>
+                          <option value="CUSTOM">其他方案（自行輸入）</option>
+                        </select>
+                        <input type="text" id="plan-custom-chatgpt" class="custom-plan-input" maxlength="60" placeholder="請輸入方案名稱" aria-label="ChatGPT 自訂方案名稱" hidden>
+                      </div>
+                      <div class="sub-field">
+                        <label for="fee-amt-chatgpt">費用金額 <span class="req-mark" aria-hidden="true">*</span></label>
+                        <div class="fee-combo">
+                          <select id="fee-unit-chatgpt" aria-label="ChatGPT 計費幣別與週期">
+                            <option value="USD/月">USD / 月</option>
+                            <option value="NT$/月">NT$ / 月</option>
+                            <option value="USD/年">USD / 年</option>
+                            <option value="NT$/年">NT$ / 年</option>
+                          </select>
+                          <input type="text" id="fee-amt-chatgpt" inputmode="decimal" maxlength="12" placeholder="例如 20 或 690">
+                        </div>
+                      </div>
+                      <div class="sub-field">
+                        <label for="payer-chatgpt">費用負擔</label>
+                        <select id="payer-chatgpt">
+                          <option value="個人自費">個人自費</option>
+                          <option value="公司既有授權／報支">公司既有授權／報支</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <!-- Claude -->
-                <div class="tool-tier-row" data-tool-row="Claude">
-                  <div class="tool-check-part">
-                    <input type="checkbox" id="cur-claude" name="currentTools" value="Claude">
-                    <label for="cur-claude">
-                      <span class="tool-name">Claude</span>
-                      <span class="tool-vendor">Anthropic</span>
-                    </label>
+                <div class="tool-tier-card" data-tool-card="Claude">
+                  <div class="tool-tier-row">
+                    <div class="tool-check-part">
+                      <input type="checkbox" id="cur-claude" name="currentTools" value="Claude">
+                      <label for="cur-claude">
+                        <span class="tool-name">Claude</span>
+                        <span class="tool-vendor">Anthropic</span>
+                      </label>
+                    </div>
+                    <div class="tier-selector" data-tier-for="Claude" hidden>
+                      <span class="tier-prompt">使用版本：</span>
+                      <div class="tier-pills" role="radiogroup" aria-label="Claude 使用版本">
+                        <input type="radio" id="tier-claude-free" name="tier_Claude" value="免費版">
+                        <label for="tier-claude-free">免費版</label>
+                        <input type="radio" id="tier-claude-paid" name="tier_Claude" value="付費版">
+                        <label for="tier-claude-paid">付費版</label>
+                      </div>
+                    </div>
                   </div>
-                  <div class="tier-selector" data-tier-for="Claude" hidden>
-                    <span class="tier-prompt">使用版本：</span>
-                    <div class="tier-pills" role="radiogroup" aria-label="Claude 使用版本">
-                      <input type="radio" id="tier-claude-free" name="tier_Claude" value="免費版">
-                      <label for="tier-claude-free">免費版</label>
-                      <input type="radio" id="tier-claude-paid-self" name="tier_Claude" value="付費版（個人自費）">
-                      <label for="tier-claude-paid-self">付費版（個人自費）</label>
-                      <input type="radio" id="tier-claude-paid-corp" name="tier_Claude" value="付費版（公司既有授權）">
-                      <label for="tier-claude-paid-corp">付費版（公司既有）</label>
+                  <div class="paid-plan-subbox" data-paid-box="Claude" hidden>
+                    <div class="paid-plan-grid">
+                      <div class="sub-field">
+                        <label for="plan-claude">訂閱方案名稱 <span class="req-mark" aria-hidden="true">*</span></label>
+                        <select id="plan-claude" data-plan-select="Claude">
+                          <option value="" disabled selected>請選擇方案…</option>
+                          <option value="Claude Pro" data-cur="USD/月" data-amt="20">Claude Pro（個人版）</option>
+                          <option value="Claude Max" data-cur="USD/月" data-amt="100">Claude Max（高用量版）</option>
+                          <option value="Claude Team" data-cur="USD/月" data-amt="25">Claude Team（商務團隊版）</option>
+                          <option value="CUSTOM">其他方案（自行輸入）</option>
+                        </select>
+                        <input type="text" id="plan-custom-claude" class="custom-plan-input" maxlength="60" placeholder="請輸入方案名稱" aria-label="Claude 自訂方案名稱" hidden>
+                      </div>
+                      <div class="sub-field">
+                        <label for="fee-amt-claude">費用金額 <span class="req-mark" aria-hidden="true">*</span></label>
+                        <div class="fee-combo">
+                          <select id="fee-unit-claude" aria-label="Claude 計費幣別與週期">
+                            <option value="USD/月">USD / 月</option>
+                            <option value="NT$/月">NT$ / 月</option>
+                            <option value="USD/年">USD / 年</option>
+                            <option value="NT$/年">NT$ / 年</option>
+                          </select>
+                          <input type="text" id="fee-amt-claude" inputmode="decimal" maxlength="12" placeholder="例如 20 或 690">
+                        </div>
+                      </div>
+                      <div class="sub-field">
+                        <label for="payer-claude">費用負擔</label>
+                        <select id="payer-claude">
+                          <option value="個人自費">個人自費</option>
+                          <option value="公司既有授權／報支">公司既有授權／報支</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <!-- Gemini -->
-                <div class="tool-tier-row" data-tool-row="Gemini">
-                  <div class="tool-check-part">
-                    <input type="checkbox" id="cur-gemini" name="currentTools" value="Gemini">
-                    <label for="cur-gemini">
-                      <span class="tool-name">Gemini</span>
-                      <span class="tool-vendor">Google</span>
-                    </label>
+                <div class="tool-tier-card" data-tool-card="Gemini">
+                  <div class="tool-tier-row">
+                    <div class="tool-check-part">
+                      <input type="checkbox" id="cur-gemini" name="currentTools" value="Gemini">
+                      <label for="cur-gemini">
+                        <span class="tool-name">Gemini</span>
+                        <span class="tool-vendor">Google</span>
+                      </label>
+                    </div>
+                    <div class="tier-selector" data-tier-for="Gemini" hidden>
+                      <span class="tier-prompt">使用版本：</span>
+                      <div class="tier-pills" role="radiogroup" aria-label="Gemini 使用版本">
+                        <input type="radio" id="tier-gemini-free" name="tier_Gemini" value="免費版">
+                        <label for="tier-gemini-free">免費版</label>
+                        <input type="radio" id="tier-gemini-paid" name="tier_Gemini" value="付費版">
+                        <label for="tier-gemini-paid">付費版</label>
+                      </div>
+                    </div>
                   </div>
-                  <div class="tier-selector" data-tier-for="Gemini" hidden>
-                    <span class="tier-prompt">使用版本：</span>
-                    <div class="tier-pills" role="radiogroup" aria-label="Gemini 使用版本">
-                      <input type="radio" id="tier-gemini-free" name="tier_Gemini" value="免費版">
-                      <label for="tier-gemini-free">免費版</label>
-                      <input type="radio" id="tier-gemini-paid-self" name="tier_Gemini" value="付費版（個人自費）">
-                      <label for="tier-gemini-paid-self">付費版（個人自費）</label>
-                      <input type="radio" id="tier-gemini-paid-corp" name="tier_Gemini" value="付費版（公司既有授權）">
-                      <label for="tier-gemini-paid-corp">付費版（公司既有）</label>
+                  <div class="paid-plan-subbox" data-paid-box="Gemini" hidden>
+                    <div class="paid-plan-grid">
+                      <div class="sub-field">
+                        <label for="plan-gemini">訂閱方案名稱 <span class="req-mark" aria-hidden="true">*</span></label>
+                        <select id="plan-gemini" data-plan-select="Gemini">
+                          <option value="" disabled selected>請選擇方案…</option>
+                          <option value="Google One AI Premium (Gemini Advanced)" data-cur="NT$/月" data-amt="650">Google One AI Premium（Gemini Advanced）</option>
+                          <option value="Google Workspace 商務版 (含 Gemini)" data-cur="USD/月" data-amt="14">Google Workspace 商務版（含 Gemini）</option>
+                          <option value="CUSTOM">其他方案（自行輸入）</option>
+                        </select>
+                        <input type="text" id="plan-custom-gemini" class="custom-plan-input" maxlength="60" placeholder="請輸入方案名稱" aria-label="Gemini 自訂方案名稱" hidden>
+                      </div>
+                      <div class="sub-field">
+                        <label for="fee-amt-gemini">費用金額 <span class="req-mark" aria-hidden="true">*</span></label>
+                        <div class="fee-combo">
+                          <select id="fee-unit-gemini" aria-label="Gemini 計費幣別與週期">
+                            <option value="NT$/月">NT$ / 月</option>
+                            <option value="USD/月">USD / 月</option>
+                            <option value="NT$/年">NT$ / 年</option>
+                            <option value="USD/年">USD / 年</option>
+                          </select>
+                          <input type="text" id="fee-amt-gemini" inputmode="decimal" maxlength="12" placeholder="例如 650 或 20">
+                        </div>
+                      </div>
+                      <div class="sub-field">
+                        <label for="payer-gemini">費用負擔</label>
+                        <select id="payer-gemini">
+                          <option value="個人自費">個人自費</option>
+                          <option value="公司既有授權／報支">公司既有授權／報支</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <!-- Microsoft 365 Copilot -->
-                <div class="tool-tier-row" data-tool-row="Microsoft 365 Copilot">
-                  <div class="tool-check-part">
-                    <input type="checkbox" id="cur-copilot" name="currentTools" value="Microsoft 365 Copilot">
-                    <label for="cur-copilot">
-                      <span class="tool-name">Microsoft 365 Copilot</span>
-                      <span class="tool-vendor">Microsoft</span>
-                    </label>
+                <div class="tool-tier-card" data-tool-card="Microsoft 365 Copilot">
+                  <div class="tool-tier-row">
+                    <div class="tool-check-part">
+                      <input type="checkbox" id="cur-copilot" name="currentTools" value="Microsoft 365 Copilot">
+                      <label for="cur-copilot">
+                        <span class="tool-name">Microsoft 365 Copilot</span>
+                        <span class="tool-vendor">Microsoft</span>
+                      </label>
+                    </div>
+                    <div class="tier-selector" data-tier-for="Microsoft 365 Copilot" hidden>
+                      <span class="tier-prompt">使用版本：</span>
+                      <div class="tier-pills" role="radiogroup" aria-label="Microsoft 365 Copilot 使用版本">
+                        <input type="radio" id="tier-copilot-free" name="tier_Copilot" value="免費版">
+                        <label for="tier-copilot-free">免費版（網頁／Edge）</label>
+                        <input type="radio" id="tier-copilot-paid" name="tier_Copilot" value="付費版">
+                        <label for="tier-copilot-paid">付費版</label>
+                      </div>
+                    </div>
                   </div>
-                  <div class="tier-selector" data-tier-for="Microsoft 365 Copilot" hidden>
-                    <span class="tier-prompt">使用版本：</span>
-                    <div class="tier-pills" role="radiogroup" aria-label="Microsoft 365 Copilot 使用版本">
-                      <input type="radio" id="tier-copilot-free" name="tier_Copilot" value="免費版">
-                      <label for="tier-copilot-free">免費版（網頁／Edge）</label>
-                      <input type="radio" id="tier-copilot-paid-self" name="tier_Copilot" value="付費版（個人自費）">
-                      <label for="tier-copilot-paid-self">付費版（個人自費）</label>
-                      <input type="radio" id="tier-copilot-paid-corp" name="tier_Copilot" value="付費版（公司既有授權）">
-                      <label for="tier-copilot-paid-corp">付費版（公司既有）</label>
+                  <div class="paid-plan-subbox" data-paid-box="Microsoft 365 Copilot" hidden>
+                    <div class="paid-plan-grid">
+                      <div class="sub-field">
+                        <label for="plan-copilot">訂閱方案名稱 <span class="req-mark" aria-hidden="true">*</span></label>
+                        <select id="plan-copilot" data-plan-select="Microsoft 365 Copilot">
+                          <option value="" disabled selected>請選擇方案…</option>
+                          <option value="Copilot Pro" data-cur="NT$/月" data-amt="690">Copilot Pro（個人版）</option>
+                          <option value="Microsoft 365 Copilot 商務／企業版" data-cur="USD/月" data-amt="30">Microsoft 365 Copilot（商務／企業版）</option>
+                          <option value="CUSTOM">其他方案（自行輸入）</option>
+                        </select>
+                        <input type="text" id="plan-custom-copilot" class="custom-plan-input" maxlength="60" placeholder="請輸入方案名稱" aria-label="Copilot 自訂方案名稱" hidden>
+                      </div>
+                      <div class="sub-field">
+                        <label for="fee-amt-copilot">費用金額 <span class="req-mark" aria-hidden="true">*</span></label>
+                        <div class="fee-combo">
+                          <select id="fee-unit-copilot" aria-label="Copilot 計費幣別與週期">
+                            <option value="NT$/月">NT$ / 月</option>
+                            <option value="USD/月">USD / 月</option>
+                            <option value="NT$/年">NT$ / 年</option>
+                            <option value="USD/年">USD / 年</option>
+                          </select>
+                          <input type="text" id="fee-amt-copilot" inputmode="decimal" maxlength="12" placeholder="例如 690 或 30">
+                        </div>
+                      </div>
+                      <div class="sub-field">
+                        <label for="payer-copilot">費用負擔</label>
+                        <select id="payer-copilot">
+                          <option value="個人自費">個人自費</option>
+                          <option value="公司既有授權／報支">公司既有授權／報支</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <!-- 其他使用中工具 -->
-                <div class="tool-tier-row" data-tool-row="其他">
-                  <div class="tool-check-part">
-                    <input type="checkbox" id="cur-other" name="currentTools" value="其他">
-                    <label for="cur-other">
-                      <span class="tool-name">其他 AI 工具</span>
-                      <span class="tool-vendor">自行輸入</span>
-                    </label>
-                  </div>
-                  <div class="tier-selector" data-tier-for="其他" hidden>
-                    <div class="other-inline-input">
-                      <label for="cur-other-name" class="visually-hidden">請輸入目前使用的其他 AI 工具名稱</label>
-                      <input type="text" id="cur-other-name" name="currentOtherName" maxlength="60" placeholder="請輸入工具名稱（如 Perplexity、Cursor…）">
+                <div class="tool-tier-card" data-tool-card="其他">
+                  <div class="tool-tier-row">
+                    <div class="tool-check-part">
+                      <input type="checkbox" id="cur-other" name="currentTools" value="其他">
+                      <label for="cur-other">
+                        <span class="tool-name">其他 AI 工具</span>
+                        <span class="tool-vendor">自行輸入</span>
+                      </label>
                     </div>
-                    <div class="tier-pills" role="radiogroup" aria-label="其他工具使用版本">
-                      <input type="radio" id="tier-other-free" name="tier_Other" value="免費版">
-                      <label for="tier-other-free">免費版</label>
-                      <input type="radio" id="tier-other-paid-self" name="tier_Other" value="付費版（個人自費）">
-                      <label for="tier-other-paid-self">付費版（個人自費）</label>
-                      <input type="radio" id="tier-other-paid-corp" name="tier_Other" value="付費版（公司既有授權）">
-                      <label for="tier-other-paid-corp">付費版（公司既有）</label>
+                    <div class="tier-selector" data-tier-for="其他" hidden>
+                      <div class="other-inline-input">
+                        <label for="cur-other-name" class="visually-hidden">請輸入目前使用的其他 AI 工具名稱</label>
+                        <input type="text" id="cur-other-name" name="currentOtherName" maxlength="60" placeholder="工具名稱（如 Perplexity、Cursor…）">
+                      </div>
+                      <div class="tier-pills" role="radiogroup" aria-label="其他工具使用版本">
+                        <input type="radio" id="tier-other-free" name="tier_Other" value="免費版">
+                        <label for="tier-other-free">免費版</label>
+                        <input type="radio" id="tier-other-paid" name="tier_Other" value="付費版">
+                        <label for="tier-other-paid">付費版</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="paid-plan-subbox" data-paid-box="其他" hidden>
+                    <div class="paid-plan-grid">
+                      <div class="sub-field">
+                        <label for="plan-custom-other">訂閱方案名稱 <span class="req-mark" aria-hidden="true">*</span></label>
+                        <input type="text" id="plan-custom-other" maxlength="60" placeholder="例如：Pro 個人版、Business 商務版">
+                      </div>
+                      <div class="sub-field">
+                        <label for="fee-amt-other">費用金額 <span class="req-mark" aria-hidden="true">*</span></label>
+                        <div class="fee-combo">
+                          <select id="fee-unit-other" aria-label="其他工具計費幣別與週期">
+                            <option value="USD/月">USD / 月</option>
+                            <option value="NT$/月">NT$ / 月</option>
+                            <option value="USD/年">USD / 年</option>
+                            <option value="NT$/年">NT$ / 年</option>
+                          </select>
+                          <input type="text" id="fee-amt-other" inputmode="decimal" maxlength="12" placeholder="例如 20 或 650">
+                        </div>
+                      </div>
+                      <div class="sub-field">
+                        <label for="payer-other">費用負擔</label>
+                        <select id="payer-other">
+                          <option value="個人自費">個人自費</option>
+                          <option value="公司既有授權／報支">公司既有授權／報支</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div id="current-tools-error" class="error-msg" hidden>
-                <span role="img" aria-label="錯誤">⚠️</span> <span id="current-tools-error-text">請至少勾選一項正在使用的工具，並選擇使用版本（免費版或付費版）。</span>
+                <span role="img" aria-label="錯誤">⚠️</span> <span id="current-tools-error-text">請至少勾選一項正在使用的工具，並填寫完整版本與付費方案資訊。</span>
               </div>
             </fieldset>
           </div>
@@ -652,7 +787,7 @@
               <tr>
                 <th scope="col">員工姓名</th>
                 <th scope="col">所屬部門</th>
-                <th scope="col">目前使用現況（免費／付費）</th>
+                <th scope="col">目前使用現況（方案與費用）</th>
                 <th scope="col">希望申請工具</th>
                 <th scope="col">使用頻率</th>
                 <th scope="col">主要工作用途</th>
